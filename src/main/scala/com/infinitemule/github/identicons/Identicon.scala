@@ -12,6 +12,14 @@ import javax.imageio.ImageIO
 
 
 object Identicon {
+    
+  object Display {
+    val width = 84
+    val backgroundColor = new Color(240, 240, 240)
+    val saturation = 0.45f
+    val value      = 0.80f
+  }
+  
 
   /**
    * Still trying to figure out how GitHub does this but I am
@@ -20,7 +28,7 @@ object Identicon {
    * 
    * - Get a hash
    * - Divide into groups of two hex digits ("f3", "87" ...)
-   * - Parse to Int and map mod 2 over them to get odd/even (0, 1, 0 ...)
+   * - Map mod 2 over them to get odd/even, odd being true (false, true, false ...)
    * - Group them into threes, drop the last digit (5 lists of three digits)
    * - Take the last two numbers, reverse them and add them to the front of 
    *   the list (0, 0, 1) => (1, 0, 0, 0, 1)
@@ -28,16 +36,14 @@ object Identicon {
   def create(username: String): Identicon = {
            
     val hash = DigestUtils.sha1Hex(username)
-      .grouped(2)
-      .toList
+      .grouped(2).toList
       .map { Integer.parseInt(_, 16) }
     
     val glyph = hash        
-        .map { _ % 2 }
+        .map { _ % 2 == 1 }
         .grouped(3)
         .take(5)
-        .map { xs => xs(2) :: xs(1) :: xs }
-        .toList
+        .map { xs => xs(2) :: xs(1) :: xs }.toList
             
     val color = createColor(hash.take(3))
         
@@ -49,7 +55,7 @@ object Identicon {
    * 
    * I have no idea how GitHub determines the color 
    * but this will keep the colors within a nice visible
-   * range (i.e. colors that are close to all white or all black)
+   * range (i.e. colors that are not close to all white or all black)
    * 
    * - Take a color in RGB 0-255
    * - Covert it to HSB so that we can get the hue
@@ -62,16 +68,27 @@ object Identicon {
     
     val hsb = Color.RGBtoHSB(rgb(0), rgb(1), rgb(2), null)
     
-    new Color(Color.HSBtoRGB(hsb(0), 0.45f, 0.80f))
+    new Color(Color.HSBtoRGB(
+        hsb(0), 
+        Identicon.Display.saturation, 
+        Identicon.Display.value))
                 
   }
       
     
 }
 
-case class Identicon(val glyph: List[List[Int]], val color: Color) {
+
+/**
+ *
+ */
+case class Identicon(val glyph: List[List[Boolean]], val color: Color) {
   
   
+  /**
+   * Gets the color in hex RGB format.  Useful
+   * if you want to draw it in HTML.
+   */
   def hexColor(): String = {
      "%02x%02x%02x".format(
             color.getRed(), 
@@ -85,10 +102,12 @@ case class Identicon(val glyph: List[List[Int]], val color: Color) {
    */ 
   def createImage(): BufferedImage = {
     
-    val img = new BufferedImage(420, 420, BufferedImage.TYPE_INT_RGB)
+    val width = Identicon.Display.width
+    
+    val img = new BufferedImage(width * 5, width * 5, BufferedImage.TYPE_INT_RGB)
     val gfx = img.createGraphics()
 
-    gfx.setColor(new Color(240, 240, 240))
+    gfx.setColor(Identicon.Display.backgroundColor)
     gfx.fillRect(0, 0, img.getWidth(), img.getHeight())    
     gfx.setColor(color)
     
@@ -101,12 +120,14 @@ case class Identicon(val glyph: List[List[Int]], val color: Color) {
      */
     val onPixels =  glyph.map { _.zipWithIndex } .zipWithIndex
      .map { case(row, i) => 
-       row.filter { case(bit, j) => bit == 1 } 
-       .map { case(bit, j) => (j, i) } 
+       row.filter { case(bit, j) => bit } 
+          .map    { case(bit, j) => (j, i) } 
      } 
      .flatten
 
-    onPixels.map { case(x, y) => gfx.fillRect(x * 84, y * 84, 84, 84) } 
+    onPixels.map { case(x, y) => 
+      gfx.fillRect(x * width, y * width, width, width) 
+    } 
     
     img
   }
@@ -134,10 +155,11 @@ case class Identicon(val glyph: List[List[Int]], val color: Color) {
   def print() = {
         
     glyph.foreach { row =>
-      println(row.map { x => if(x == 1) "X" else " " }.mkString(""))      
+      println(row.map { x => if(x) "X" else " " }
+                 .mkString(""))      
     }
     
-    println("COLOR: " + hexColor)
+    println("COLOR: #" + hexColor)
     
   }
 }
