@@ -13,13 +13,14 @@ import javax.imageio.ImageIO
 
 object Identicon {
     
-  object Display {
-    val width = 84
+  object Display {    
     val backgroundColor = new Color(240, 240, 240)
+    val width      = 84
     val saturation = 0.45f
     val value      = 0.80f
   }
   
+  def hash(s: String) = DigestUtils.sha1Hex(s)
 
   /**
    * Still trying to figure out how GitHub does this but I am
@@ -35,17 +36,17 @@ object Identicon {
    */
   def create(username: String): Identicon = {
            
-    val hash = DigestUtils.sha1Hex(username)
+    val bitmap = hash(username)
       .grouped(2).toList
       .map { Integer.parseInt(_, 16) }
     
-    val glyph = hash        
+    val glyph = bitmap       
         .map { _ % 2 == 1 }
         .grouped(3)
         .take(5)
         .map { xs => xs(2) :: xs(1) :: xs }.toList
             
-    val color = createColor(hash.take(3))
+    val color = createColor(bitmap.take(3))
         
     Identicon(glyph, color)
   }  
