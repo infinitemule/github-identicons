@@ -21,5 +21,36 @@ class IdenticonSuite extends FunSuite {
     
   }
   
+  /**
+   * Note this will fail if a different hash algo is used
+   */
+  test("Using test as a username should create the spicified identicon") {
+    
+    val identicon = Identicon.create("test")
+    
+    assert(identicon.glyph(0)(0))
+    assert(identicon.glyph(0)(2))
+    assert(identicon.glyph(0)(4))
+    
+    assert(identicon.glyph(1)(0))
+    assert(identicon.glyph(1)(2))
+    assert(identicon.glyph(1)(4))
+
+    assert(identicon.glyph(2)(2))
+
+    assert(identicon.glyph(3)(0))
+    assert(identicon.glyph(3)(4))
+
+    assert(identicon.glyph(4)(0))
+    assert(identicon.glyph(4)(1))
+    assert(identicon.glyph(4)(2))
+    assert(identicon.glyph(4)(3))
+    assert(identicon.glyph(4)(4))
+
+    assert(identicon.color.getRed()   === 204)
+    assert(identicon.color.getGreen() === 112)
+    assert(identicon.color.getBlue()  === 179)
+    
+  }
   
 }
