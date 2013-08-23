@@ -120,9 +120,9 @@ case class Identicon(val glyph: List[List[Boolean]], val color: Color) {
      *   each on pixel (i.e ((0,1), (0,2), (0,3), (1,0), ...
      */
     val onPixels =  glyph.map { _.zipWithIndex } .zipWithIndex
-     .map { case(row, i) => 
-       row.filter { case(bit, j) => bit } 
-          .map    { case(bit, j) => (j, i) } 
+     .map { case(row, y) => 
+       row.filter { case(bit, x) => bit } 
+          .map    { case(bit, x) => (x, y) } 
      } 
      .flatten
 
