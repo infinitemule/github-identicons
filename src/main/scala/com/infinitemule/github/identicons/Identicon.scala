@@ -28,13 +28,14 @@ object Identicon {
    * 
    * 
    * - Get a hash
-   * - Take the first 15 hex digits of the hash 
+   * - Convert each hex digit to an integer
+   * - Take the first 15 hex digits of the integer hash 
    * - Map mod 2 over them to get odd/even, odd being true (false, true, false ...)
    * - Group them by 5 so that you have a 5x3 matrix
    * - Transpose the matrix and reverse the rows so that the
    *   first index is the (2,0) position.
    * - Take the first two bits of a row, reverse them, and
-   *   add them to the end.
+   *   add them to the end.  (true, false, true) -> (true, false, true, false, true)
    */
   def create(username: String): Identicon = {
            
