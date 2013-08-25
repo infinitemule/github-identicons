@@ -11,4 +11,4 @@ I don't know which which hash algorithm GitHub is using.
 
 You can see your GitHub Identicon using the following url:
 
-https://identicons.github.com/<your_user_name_here>
+https://identicons.github.com/<<your_user_name_here>>.png
