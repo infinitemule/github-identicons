@@ -20,33 +20,35 @@ object Identicon {
     val value      = 0.80f
   }
   
-  def hash(s: String) = DigestUtils.sha1Hex(s)
+  def hash(s: String) = DigestUtils.md5Hex(s)
 
   /**
-   * Still trying to figure out how GitHub does this but I am
-   * using the all the elements in the has but the last one,
-   * this gives me 15 numbers to work with (5x3)
+   * This is using GitHub's method to lay out the pixels,
+   * but I still don't know which hash they are using.
+   * 
    * 
    * - Get a hash
-   * - Divide into groups of two hex digits ("f3", "87" ...)
+   * - Take the first 15 hex digits of the hash 
    * - Map mod 2 over them to get odd/even, odd being true (false, true, false ...)
-   * - Group them into threes, drop the last digit (5 lists of three digits)
-   * - Take the last two numbers, reverse them and add them to the front of 
-   *   the list (0, 0, 1) => (1, 0, 0, 0, 1)
+   * - Group them by 5 so that you have a 5x3 matrix
+   * - Transpose the matrix and reverse the rows so that the
+   *   first index is the (2,0) position.
+   * - Take the first two bits of a row, reverse them, and
+   *   add them to the end.
    */
   def create(username: String): Identicon = {
            
-    val bitmap = hash(username)
-      .grouped(2).toList
-      .map { Integer.parseInt(_, 16) }
+    val ints = hash(username).toCharArray().toList
+      .map { b => Integer.parseInt(b.toString, 16) }
     
-    val glyph = bitmap       
-        .map { _ % 2 == 1 }
-        .grouped(3)
-        .take(5)
-        .map { xs => xs(2) :: xs(1) :: xs }.toList
-            
-    val color = createColor(bitmap.take(3))
+    val glyph = ints
+      .take(15)      
+      .map { h  => (h % 2) == 1 }
+      .grouped(5).toList
+      .transpose
+      .map { xs => xs.reverse ::: xs.tail }
+                
+    val color = createColor(ints.take(3))
         
     Identicon(glyph, color)
   }  
@@ -155,7 +157,7 @@ case class Identicon(val glyph: List[List[Boolean]], val color: Color) {
    */
   def print() = {
         
-    glyph.foreach { row =>
+    glyph.foreach { row =>      
       println(row.map { x => if(x) "X" else " " }
                  .mkString(""))      
     }

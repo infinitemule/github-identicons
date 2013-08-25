@@ -28,28 +28,28 @@ class IdenticonSuite extends FunSuite {
     
     val identicon = Identicon.create("test")
     
-    assert(identicon.glyph(0)(0))
-    assert(identicon.glyph(0)(2))
-    assert(identicon.glyph(0)(4))
-    
+    assert(identicon.glyph(0)(1))
+    assert(identicon.glyph(0)(3))
+       
     assert(identicon.glyph(1)(0))
     assert(identicon.glyph(1)(2))
     assert(identicon.glyph(1)(4))
-
-    assert(identicon.glyph(2)(2))
+    
+    assert(identicon.glyph(2)(0))
+    assert(identicon.glyph(2)(1))
+    assert(identicon.glyph(2)(3))
+    assert(identicon.glyph(2)(4))
 
     assert(identicon.glyph(3)(0))
+    assert(identicon.glyph(3)(2))
     assert(identicon.glyph(3)(4))
-
+    
     assert(identicon.glyph(4)(0))
-    assert(identicon.glyph(4)(1))
-    assert(identicon.glyph(4)(2))
-    assert(identicon.glyph(4)(3))
     assert(identicon.glyph(4)(4))
 
-    assert(identicon.color.getRed()   === 204)
-    assert(identicon.color.getGreen() === 112)
-    assert(identicon.color.getBlue()  === 179)
+    assert(identicon.color.getRed()   === 112)
+    assert(identicon.color.getGreen() === 204)
+    assert(identicon.color.getBlue()  === 194)
     
   }
   
