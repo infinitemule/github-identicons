@@ -1,7 +1,7 @@
 GitHub Identicons
 =================
 
-Scala implementation of GitHub's identicons.
+Scala implementation of GitHub's [identicons](https://github.com/blog/1586-identicons).
 
 ### Notes
 
